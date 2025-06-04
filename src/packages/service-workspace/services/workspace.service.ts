@@ -120,6 +120,6 @@ export class WorkspaceService {
 
 
     async removeMemberFromWorkspace(workspaceId: string, userId: string, memberToRemoveId: string): Promise<boolean> { return false }
-    async updateMemberRoleInWorkspace(workspaceId: string, userId: string, dto: UpdateMemberRoleDto) { }
+    async updateMemberRoleInWorkspace(workspaceId: string, userId: string, dto: UpdateMemberRoleDto): Promise<IWorkspaceMember> { return {} as IWorkspaceMember }
     async getMembersFromWorkspace(workspaceId: string, userId: string) { }
 }

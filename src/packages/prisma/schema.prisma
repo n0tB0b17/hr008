@@ -1,0 +1,104 @@
+generator client { 
+    provider = "prisma-client-js"
+    output = "../generated/prisma"
+}
+
+datasource db { 
+    provider = "postgresql"
+    url = env("DATABASE_URL")
+}
+
+model User{
+    userId  String @id @default(uuid())
+    username    String @unique
+    email   String
+    passwordHash    String 
+    fullName    String?
+    avatarUrl   String?
+    isActive    Boolean @default(true)
+    lastLoginAt DateTime?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    setting UserSettings?
+    ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
+    workspaceMembers WorkspaceMember[]
+    activityLogs ActivityLog[] @relation("UserActivity")
+}
+
+
+model UserSettings{
+    userId  String @id
+    user    User    @relation(fields: [userId], references: [userId], onDelete: Cascade)
+    theme   String @default("white")
+    notification Boolean @default(false)
+    language    String @default("en")
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+
+enum WorkspaceVisibility{
+    PRIVATE
+    PUBLIC_READ_ONLY
+}
+
+model Workspace{
+    workspaceId String @id @default(uuid())
+    name    String 
+    description String?
+    ownerId String
+    owner User @relation("WorkspaceOwner", fields:[ownerId], references: [userId])
+    visibility WorkspaceVisibility @default(PRIVATE)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    members WorkspaceMember[]
+    activityLogs ActivityLog[] @relation("WorkspaceActivity")
+
+    @@index([name, ownerId])
+}
+
+
+enum WorkspaceMemberRole {
+    ADMIN
+    MEMBER
+}
+
+
+model WorkspaceMember{
+    workspaceId String
+    userId  String
+    role    WorkspaceMemberRole  @default(ADMIN)
+    joinedAt DateTime @default(now())
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    workspace Workspace     @relation(fields: [workspaceId], references: [workspaceId], onDelete: Cascade)
+    user User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+    @@id([workspaceId, userId])
+}
+
+
+
+model ActivityLog {
+  logId       BigInt    @id @default(autoincrement())
+  userId      String?
+  user        User?     @relation("UserActivity", fields: [userId], references: [userId], onDelete: SetNull)
+  actionType  String
+  entityType  String
+  entityId    String
+  workspaceId String?
+  workspace   Workspace? @relation("WorkspaceActivity", fields: [workspaceId], references: [workspaceId], onDelete: SetNull)
+  details     Json?   
+  ipAddress   String?
+  userAgent   String?
+  timestamp   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([actionType])
+  @@index([entityType, entityId])
+  @@index([workspaceId])
+  @@index([timestamp])
+}
