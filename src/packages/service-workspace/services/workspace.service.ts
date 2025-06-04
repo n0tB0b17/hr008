@@ -7,6 +7,7 @@ import { WorkspaceVisibility } from '@/packages/core/enums/workspace-visibility.
 import { IWorkspaceMember } from '@/packages/core/interface/iworkspacemember.interface';
 import { UpdateWorkspaceDto } from '@/packages/core/dtos/update-workspace.dto';
 import { AddMemberDto } from '@/packages/core/dtos/add-member.dto';
+import { UpdateMemberRoleDto } from '@/packages/core/dtos/update-member.dto';
 
 export class WorkspaceService {
     constructor(private readonly workspaceRepository: IworkspaceRepository) { }
@@ -112,7 +113,13 @@ export class WorkspaceService {
             throw new BadRequestError(`User: ${docs.userId} already member of workspace`)
         }
 
+        // Todo:  check if user existing in user table
+
         return await this.workspaceRepository.addMember(workspaceId, docs.userId, docs.role);
     }
 
+
+    async removeMemberFromWorkspace(workspaceId: string, userId: string, memberToRemoveId: string): Promise<boolean> { return false }
+    async updateMemberRoleInWorkspace(workspaceId: string, userId: string, dto: UpdateMemberRoleDto) { }
+    async getMembersFromWorkspace(workspaceId: string, userId: string) { }
 }
