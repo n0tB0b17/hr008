@@ -7,7 +7,7 @@ import { IWorkspaceMember } from "@/packages/core/interface/iworkspacemember.int
 export interface IworkspaceRepository {
     create(docs: CreateWorkspaceDto, ownerId: string): Promise<IWorkspace>;
     findById(workspaceId: string): Promise<IWorkspace | null>;
-    findByOwnerId(ownerId: string): Promise<IWorkspace[]>;
+    findByUserId(ownerId: string): Promise<IWorkspace[]>;
     delete(workspaceId: string): Promise<boolean>;
     update(workspaceId: string, docs: Partial<UpdateWorkspaceDto>): Promise<IWorkspace | null>;
 

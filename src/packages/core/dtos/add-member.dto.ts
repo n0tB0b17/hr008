@@ -1,7 +1,7 @@
 import { WorkspaceMemberRole } from "../enums/workspace-member-role.enum";
 
 
-export class AddMemberRoleDto{
+export class AddMemberDto{
     userId: string = "";
     role: WorkspaceMemberRole = WorkspaceMemberRole.MEMBER;
 }
