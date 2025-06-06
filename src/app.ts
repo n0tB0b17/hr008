@@ -5,6 +5,8 @@ import { PrismaClient } from './packages/generated/prisma/client'
 import { WorkspaceService } from './packages/services/workspace/services/workspace.service';
 import { CreateWorkspaceDto } from './packages/services/workspace/dto/create-workspace.dto';
 import { IWorkspace } from './packages/core/interface/iworkspace.interface';
+import { cacheService } from './packages/core/cache/redis.cache';
+import { natsService } from './packages/core/nats/nats';
 
 
 const Server = () => {
@@ -15,9 +17,9 @@ const Server = () => {
     app.use(express.json())
     app.use(express.urlencoded({ extended: true }));
 
-    app.post("/health", async (req: Request, res: Response) => {
+    app.post("/api/v1/workspace", async (req: Request, res: Response) => {
         const workspaceRepo = new WorkspaceRepository(prismaClient);
-        const workspaceService = new WorkspaceService(workspaceRepo);
+        const workspaceService = new WorkspaceService(workspaceRepo, cacheService, natsService);
 
         const { name, description, visibility } = req.body;
         if (!name) {
@@ -41,7 +43,7 @@ const Server = () => {
             workspace
         })
         return
-    })
+    });
 
     return app;
 }

@@ -8,9 +8,21 @@ import { IWorkspaceMember } from '../../../core/interface/iworkspacemember.inter
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
 import { AddMemberDto } from '../dto/add-member.dto';
 import { UpdateMemberRoleDto } from '../dto/update-member.dto';
+import { ICacheService } from '@/packages/core/cache/cache.interface';
+import { INatsService } from '@/packages/core/nats/nats.interface';
+
+
+const WORKSPACE_CACHE_PREFIX = "workspace";
+const WORKSPACE_MEMBER_CACHE_PREFIX = "workspace_member"
+const USER_WORKSPACE_CACHE_PREFIX = "user_workspace"
+const DEFAULT_CACHE_TTL = 3600;
 
 export class WorkspaceService {
-    constructor(private readonly workspaceRepository: IworkspaceRepository) { }
+    constructor(
+        private readonly workspaceRepository: IworkspaceRepository,
+        private readonly cacheRepository: ICacheService,
+        private readonly natsRepository: INatsService
+    ) { }
 
     async createWorkspace(docs: CreateWorkspaceDto, ownerId: string): Promise<IWorkspace> {
         if (!docs.name || docs.name.trim() === "") {
@@ -29,6 +41,19 @@ export class WorkspaceService {
 
     // userId: requesting user's id
     async getWorkspaceById(workspaceId: string, userId: string): Promise<IWorkspace> {
+        const cacheKey: string = `${WORKSPACE_CACHE_PREFIX}:${workspaceId}`;
+
+        const cachedWorkspace: IWorkspace | null = await this.cacheRepository.get<IWorkspace>(cacheKey);
+        if (cachedWorkspace) {
+            if (cachedWorkspace.visibility === WorkspaceVisibility.PRIVATE) {
+                const member = await this.workspaceRepository.findMember(workspaceId, userId);
+                if (!member) {
+                    throw new ForbiddenError(`You do not have permission to workspace: ${cachedWorkspace.name}`);
+                }
+            }
+            return cachedWorkspace;
+        }
+
         const workspace: IWorkspace | null = await this.workspaceRepository.findById(workspaceId);
         if (!workspace) {
             throw new NotFoundError(`Workspace with ID: ${workspaceId} not found`);
@@ -41,15 +66,25 @@ export class WorkspaceService {
             }
         }
 
+        await this.cacheRepository.set<IWorkspace>(cacheKey, workspace, DEFAULT_CACHE_TTL);
         return workspace;
     }
 
 
     async getWorkspacesForUser(userId: string): Promise<IWorkspace[]> {
-        // complex query can be added to repository to fetch all Workspace user is belong to
+        // complex query can be added to repository to fetch all Workspace user belong to
         // currently it only returns workspace owned by user
-        const workspace: IWorkspace[] = await this.workspaceRepository.findByUserId(userId);
-        return workspace;
+
+        const cacheKey: string = `${USER_WORKSPACE_CACHE_PREFIX}:${userId}`;
+        const cachedWorkspace: IWorkspace[] | null = await this.cacheRepository.getWithPopulate(
+            cacheKey,
+            () => this.workspaceRepository.findByUserId(userId),
+            DEFAULT_CACHE_TTL
+        )
+
+        if (!cachedWorkspace) return [];
+
+        return cachedWorkspace;
     }
 
 
@@ -73,6 +108,9 @@ export class WorkspaceService {
             throw new NotFoundError(`Workspace with id: ${workspaceId} cannot be updated or be found`)
         }
 
+        const cacheKey: string = `${WORKSPACE_CACHE_PREFIX}:${workspaceId}`
+        await this.cacheRepository.del(cacheKey)
+
         return updatedWorkspace;
     }
 
@@ -92,6 +130,13 @@ export class WorkspaceService {
         }
 
         const deleteResp: boolean = await this.workspaceRepository.delete(workspace.workspaceId);
+        if (deleteResp) {
+            const cacheKey: string = `${WORKSPACE_CACHE_PREFIX}:${workspaceId}`;
+            const cacheKeyMember: string = `${WORKSPACE_MEMBER_CACHE_PREFIX}:${workspaceId}`;
+
+            await this.cacheRepository.del([cacheKey, cacheKeyMember]);
+        }
+
         return deleteResp;
     }
 
@@ -113,13 +158,14 @@ export class WorkspaceService {
             throw new BadRequestError(`User: ${docs.userId} already member of workspace`)
         }
 
-        // Todo:  check if user existing in user table
-
         return await this.workspaceRepository.addMember(workspaceId, docs.userId, docs.role);
     }
 
 
-    async removeMemberFromWorkspace(workspaceId: string, userId: string, memberToRemoveId: string): Promise<boolean> { return false }
-    async updateMemberRoleInWorkspace(workspaceId: string, userId: string, dto: UpdateMemberRoleDto): Promise<IWorkspaceMember> { return {} as IWorkspaceMember }
-    async getMembersFromWorkspace(workspaceId: string, userId: string) { }
+    async removeMemberFromWorkspace(workspaceId: string, userId: string, memberToRemoveId: string): Promise<boolean> {
+        return false
+    }
+    async updateMemberRoleInWorkspace(workspaceId: string, userId: string, dto: UpdateMemberRoleDto): Promise<IWorkspaceMember> {
+        return {} as IWorkspaceMember
+    }
 }
