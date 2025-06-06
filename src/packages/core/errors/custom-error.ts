@@ -20,7 +20,6 @@ class ForbiddenError extends Error {
     }
 }
 
-
 export {
     NotFoundError,
     BadRequestError,

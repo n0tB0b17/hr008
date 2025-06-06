@@ -1,12 +1,11 @@
-import { PrismaClient, Workspace, WorkspaceMember } from "../../generated/prisma";
+import { PrismaClient, Workspace, WorkspaceMember } from "../../../generated/prisma";
 import { IworkspaceRepository } from "./iworkspace.repository";
-import { CreateWorkspaceDto } from "@/packages/core/dtos/create-workspace.dto";
-import { IWorkspace } from "@/packages/core/interface/iworkspace.interface";
-import { UpdateWorkspaceDto } from "@/packages/core/dtos/update-workspace.dto";
-import { WorkspaceMemberRole } from "@/packages/core/enums/workspace-member-role.enum";
-import { IWorkspaceMember } from "@/packages/core/interface/iworkspacemember.interface";
-import { NotFoundError } from "@/packages/core/errors/custom-error";
-
+import { CreateWorkspaceDto } from "../dto/create-workspace.dto";
+import { IWorkspace } from "../../../core/interface/iworkspace.interface";
+import { UpdateWorkspaceDto } from "../dto/update-workspace.dto";
+import { WorkspaceMemberRole } from "../../../core/enums/workspace-member-role.enum";
+import { IWorkspaceMember } from "../../../core/interface/iworkspacemember.interface";
+import { NotFoundError } from "../../../core/errors/custom-error";
 
 
 const toDomainInWorkspace = (prismaWorkspace: Workspace): IWorkspace => {
@@ -154,7 +153,7 @@ class WorkspaceRepository implements IworkspaceRepository {
             if (e.code === "P2025") {
                 throw new NotFoundError("not found...");
             }
-            
+
             console.error(`error while deleting member from workspace`);
             return false;
         }

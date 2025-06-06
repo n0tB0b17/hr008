@@ -1,13 +1,13 @@
-import { CreateWorkspaceDto } from '@/packages/core/dtos/create-workspace.dto';
+import { CreateWorkspaceDto } from '../dto/create-workspace.dto';
 import { IworkspaceRepository } from '../repository/iworkspace.repository';
-import { BadRequestError, ForbiddenError, NotFoundError } from '@/packages/core/errors/custom-error';
+import { BadRequestError, ForbiddenError, NotFoundError } from '../../../core/errors/custom-error';
 import { IWorkspace } from '@/packages/core/interface/iworkspace.interface';
-import { WorkspaceMemberRole } from '@/packages/core/enums/workspace-member-role.enum';
-import { WorkspaceVisibility } from '@/packages/core/enums/workspace-visibility.enum';
-import { IWorkspaceMember } from '@/packages/core/interface/iworkspacemember.interface';
-import { UpdateWorkspaceDto } from '@/packages/core/dtos/update-workspace.dto';
-import { AddMemberDto } from '@/packages/core/dtos/add-member.dto';
-import { UpdateMemberRoleDto } from '@/packages/core/dtos/update-member.dto';
+import { WorkspaceMemberRole } from '../../../core/enums/workspace-member-role.enum';
+import { WorkspaceVisibility } from '../../../core/enums/workspace-visibility.enum';
+import { IWorkspaceMember } from '../../../core/interface/iworkspacemember.interface';
+import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
+import { AddMemberDto } from '../dto/add-member.dto';
+import { UpdateMemberRoleDto } from '../dto/update-member.dto';
 
 export class WorkspaceService {
     constructor(private readonly workspaceRepository: IworkspaceRepository) { }

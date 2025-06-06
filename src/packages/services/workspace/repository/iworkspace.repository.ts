@@ -1,8 +1,8 @@
-import { CreateWorkspaceDto } from "@/packages/core/dtos/create-workspace.dto";
-import { UpdateWorkspaceDto } from "@/packages/core/dtos/update-workspace.dto";
-import { WorkspaceMemberRole } from "@/packages/core/enums/workspace-member-role.enum";
-import { IWorkspace } from "@/packages/core/interface/iworkspace.interface";
-import { IWorkspaceMember } from "@/packages/core/interface/iworkspacemember.interface";
+import { CreateWorkspaceDto } from "../dto/create-workspace.dto";
+import { UpdateWorkspaceDto } from "../dto/update-workspace.dto";
+import { WorkspaceMemberRole } from "../../../core/enums/workspace-member-role.enum";
+import { IWorkspace } from "../../../core/interface/iworkspace.interface";
+import { IWorkspaceMember } from "../../../core/interface/iworkspacemember.interface";
 
 export interface IworkspaceRepository {
     create(docs: CreateWorkspaceDto, ownerId: string): Promise<IWorkspace>;

@@ -199,7 +199,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/home/lilbob/Projects/hr008/src/packages/generated/prisma",
+      "value": "/home/baiman/Documents/hr008/src/packages/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -213,7 +213,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/home/lilbob/Projects/hr008/src/packages/prisma/schema.prisma",
+    "sourceFilePath": "/home/baiman/Documents/hr008/src/packages/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
