@@ -1,5 +1,5 @@
 import { Redis } from "ioredis";
-import { ICacheService } from "./cache.interface";
+import { ICacheService } from "../interface/cache.interface";
 import { RedisOptions } from "ioredis";
 
 

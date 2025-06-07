@@ -8,7 +8,7 @@ import { IWorkspaceMember } from '../../../core/interface/iworkspacemember.inter
 import { UpdateWorkspaceDto } from '../dto/update-workspace.dto';
 import { AddMemberDto } from '../dto/add-member.dto';
 import { UpdateMemberRoleDto } from '../dto/update-member.dto';
-import { ICacheService } from '@/packages/core/cache/cache.interface';
+import { ICacheService } from '@/packages/core/interface/cache.interface';
 import { INatsService } from '@/packages/core/nats/nats.interface';
 
 

@@ -1,4 +1,4 @@
-import { HealthCheck, HealthCheckResult } from "./health.interface";
+import { HealthCheck, HealthCheckResult } from "../interface/health.interface";
 
 
 export class RedisHealthCheck implements HealthCheck {
